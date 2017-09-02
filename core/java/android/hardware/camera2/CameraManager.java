@@ -89,32 +89,35 @@ public final class CameraManager {
 
             if (context.getResources().
                     getBoolean(R.bool.config_useWakeLockForFlashlight)) {
-                PowerManager powerManager = (PowerManager)context.
-                        getSystemService(Context.POWER_SERVICE);
-                mFlashlightWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+                Looper looper = Looper.myLooper();
+                if (looper != null) {
+                    PowerManager powerManager = (PowerManager)context.
+                            getSystemService(Context.POWER_SERVICE);
+                    mFlashlightWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
-                TorchCallback torchCallback = new CameraManager.TorchCallback() {
-                    @Override
-                    public void onTorchModeUnavailable(String cameraId) {
-                        if (mFlashlightWakeLock.isHeld()) {
-                            mFlashlightWakeLock.release();
-                        }
-                    }
-
-                    @Override
-                    public void onTorchModeChanged(String cameraId, boolean enabled) {
-                        if (enabled) {
-                            if (!mFlashlightWakeLock.isHeld()) {
-                                mFlashlightWakeLock.acquire();
-                            }
-                        } else {
+                    TorchCallback torchCallback = new CameraManager.TorchCallback() {
+                        @Override
+                        public void onTorchModeUnavailable(String cameraId) {
                             if (mFlashlightWakeLock.isHeld()) {
                                 mFlashlightWakeLock.release();
                             }
                         }
-                    }
-                };
-                registerTorchCallback(torchCallback, null);
+
+                        @Override
+                        public void onTorchModeChanged(String cameraId, boolean enabled) {
+                            if (enabled) {
+                                if (!mFlashlightWakeLock.isHeld()) {
+                                    mFlashlightWakeLock.acquire();
+                                }
+                            } else {
+                                if (mFlashlightWakeLock.isHeld()) {
+                                    mFlashlightWakeLock.release();
+                                }
+                            }
+                        }
+                    };
+                    registerTorchCallback(torchCallback, new Handler(looper));
+                }
             }
         }
     }
@@ -955,6 +958,26 @@ public final class CameraManager {
                     throw new IllegalArgumentException("cameraId was null");
                 }
 
+                /* Force to expose only two cameras
+                 * if the package name does not falls in this bucket
+                 */
+                boolean exposeAuxCamera = false;
+                String packageName = ActivityThread.currentOpPackageName();
+                String packageList = SystemProperties.get("camera.aux.packagelist");
+                if (packageList.length() > 0) {
+                    TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
+                    splitter.setString(packageList);
+                    for (String str : splitter) {
+                        if (packageName.equals(str)) {
+                            exposeAuxCamera = true;
+                            break;
+                        }
+                    }
+                }
+                if (exposeAuxCamera == false && (Integer.parseInt(cameraId) >= 2)) {
+                    throw new IllegalArgumentException("invalid cameraId");
+                }
+
                 ICameraService cameraService = getCameraService();
                 if (cameraService == null) {
                     throw new CameraAccessException(CameraAccessException.CAMERA_DISCONNECTED,
@@ -1167,6 +1190,31 @@ public final class CameraManager {
                 Log.v(TAG,
                         String.format("Camera id %s has torch status changed to 0x%x", id, status));
             }
+
+            /* Force to ignore the aux or composite camera torch status update
+             * if the package name does not falls in this bucket
+             */
+            boolean exposeMonoCamera = false;
+            String packageName = ActivityThread.currentOpPackageName();
+            String packageList = SystemProperties.get("camera.aux.packagelist");
+            if (packageList.length() > 0) {
+                TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
+                splitter.setString(packageList);
+                for (String str : splitter) {
+                    if (packageName.equals(str)) {
+                        exposeMonoCamera = true;
+                        break;
+                    }
+                }
+            }
+
+            if (exposeMonoCamera == false) {
+                if (Integer.parseInt(id) >= 2) {
+                    Log.w(TAG, "ignore the torch status update of camera: " + id);
+                    return;
+                }
+            }
+
 
             if (!validTorchStatus(status)) {
                 Log.e(TAG, String.format("Ignoring invalid device %s torch status 0x%x", id,

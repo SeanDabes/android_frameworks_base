@@ -31,8 +31,11 @@
   <!-- Button to restart the phone, within the Restart Options dialog -->
   <string name="reboot_reboot">Reaniciar</string>
   <!-- Button to restart the phone into recovery, within the Restart Options dialog -->
+  <string name="reboot_recovery">Recovery</string>
   <!-- Button to restart the phone into bootloader, within the Restart Options dialog -->
+  <string name="reboot_bootloader">Cargador d\'arranque</string>
   <!-- Button to restart the phone into download, within the Restart Options dialog -->
+  <string name="reboot_download">Descarga</string>
   <!-- Button to soft restart the device, within the Restart Options dialog -->
   <string name="reboot_soft">Reaniciu suave</string>
   <!-- Title of dialog to confirm restarting. -->
@@ -118,7 +121,7 @@
   <string name="app_ops_assist_screenshot">facer una captura</string>
   <string name="app_ops_use_body_sensors">usar sensores corporales</string>
   <string name="app_ops_read_cell_broadcasts">lleer tresmisiones celulares</string>
-  <string name="app_ops_mock_location">simular l\'allugamientu</string>
+  <string name="app_ops_mock_location">falsiar el to allugamientu</string>
   <string name="app_ops_read_external_storage">lleer almacenamientu esternu</string>
   <string name="app_ops_write_external_storage">escribir nel almacenamientu esternu</string>
   <string name="app_ops_turn_on_screen">prender pantalla</string>

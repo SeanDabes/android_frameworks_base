@@ -37,10 +37,13 @@
          charged, say that it is charged. -->
   <!-- When the lock screen is showing and the phone plugged in, and the battery
          is not fully charged, say that it's charging.  -->
+  <string name="keyguard_plugged_in">Cargando</string>
   <!-- When the lock screen is showing and the phone plugged in, and the battery
          is not fully charged, and it's plugged into a fast charger, say that it's charging fast.  -->
+  <string name="keyguard_plugged_in_charging_fast">Carga rápida</string>
   <!-- When the lock screen is showing and the phone plugged in, and the battery
          is not fully charged, and it's plugged into a slow charger, say that it's charging slowly.  -->
+  <string name="keyguard_plugged_in_charging_slowly">Carga lenta</string>
   <!-- When the lock screen is showing and the battery is low, warn user to plug
          in the phone soon. -->
   <!-- On the keyguard screen, when pattern lock is disabled, only tell them to press menu to unlock.  This is shown in small font at the bottom. -->
@@ -54,7 +57,9 @@
   <!-- Shown when SIM card is permanently disabled. -->
   <!-- Shown to inform the user to SIM card is permanently disabled. -->
   <!-- Shown to tell the user that their SIM is locked and they must unlock it. -->
+  <string name="keyguard_sim_locked_message">Tarxeta SIM bloquiada.</string>
   <!-- When the user enters a wrong sim pin too many times, it becomes PUK locked (Pin Unlock Kode) -->
+  <string name="keyguard_sim_puk_locked_message">Tarxeta SIM bloquiada col PUK.</string>
   <!-- For the unlock screen, When the user enters a sim unlock code, it takes a little while to check
          whether it is valid, and to unlock the sim if it is valid.  we display a
          progress dialog in the meantime.  this is the emssage. -->
@@ -151,4 +156,5 @@
   <!-- An explanation text that the pin needs to be entered since it hasn't been entered in a while. [CHAR LIMIT=80]-->
   <!-- An explanation text that the password needs to be entered since it hasn't been entered in a while. [CHAR LIMIT=80]-->
   <!-- Fingerprint hint message when finger was not recognized.-->
+  <string name="fingerprint_not_recognized">Nun se reconocío</string>
 </resources>
