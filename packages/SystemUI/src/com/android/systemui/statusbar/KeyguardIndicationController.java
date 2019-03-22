@@ -95,7 +95,10 @@ public class KeyguardIndicationController {
     private boolean mPowerPluggedInWired;
     private boolean mPowerCharged;
     private int mChargingSpeed;
+    private int mChargingCurrent;
+    private double mChargingVoltage;
     private int mChargingWattage;
+    private int mTemperature;
     private int mBatteryLevel;
     private String mMessageToShowOnScreenOn;
 
@@ -415,6 +418,27 @@ public class KeyguardIndicationController {
 
         String percentage = NumberFormat.getPercentInstance()
                 .format(mBatteryLevel / 100f);
+
+
+        String batteryInfo = "";
+        if (mChargingCurrent > 0) {
+            batteryInfo = batteryInfo + (mChargingCurrent / 1000) + "mA";
+        }
+        if (mChargingVoltage > 0) {
+            batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
+                String.format("%.1f", (mChargingVoltage / 1000 / 1000)) + "V";
+        }
+        if (mTemperature > 0) {
+            batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
+                mTemperature / 10 + "°C";
+        }
+        if (batteryInfo != "") {
+            batteryInfo = "\n" + batteryInfo;
+        }
+
+
+
+
         if (hasChargingTime) {
             // We now have battery percentage in these strings and it's expected that all
             // locales will also have it in the future. For now, we still have to support the old
@@ -423,14 +447,14 @@ public class KeyguardIndicationController {
                     mContext, chargingTimeRemaining);
             try {
                 return mContext.getResources().getString(chargingId, chargingTimeFormatted,
-                        percentage);
+                    percentage) + batteryInfo;
             } catch (IllegalFormatConversionException e) {
                 return mContext.getResources().getString(chargingId, chargingTimeFormatted);
             }
         } else {
             // Same as above
             try {
-                return mContext.getResources().getString(chargingId, percentage);
+                return mContext.getResources().getString(chargingId, percentage) + batteryInfo;
             } catch (IllegalFormatConversionException e) {
                 return mContext.getResources().getString(chargingId);
             }
@@ -501,7 +525,10 @@ public class KeyguardIndicationController {
             mPowerPluggedInWired = status.isPluggedInWired() && isChargingOrFull;
             mPowerPluggedIn = status.isPluggedIn() && isChargingOrFull;
             mPowerCharged = status.isCharged();
+            mChargingCurrent = status.maxChargingCurrent;
+            mChargingVoltage = status.maxChargingVoltage;
             mChargingWattage = status.maxChargingWattage;
+            mTemperature = status.temperature;
             mChargingSpeed = status.getChargingSpeed(mSlowThreshold, mFastThreshold);
             mBatteryLevel = status.level;
             updateIndication(!wasPluggedIn && mPowerPluggedInWired);
